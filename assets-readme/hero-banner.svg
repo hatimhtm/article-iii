@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 400" width="1280" height="400" role="img" aria-label="Article III — The Bill of Rights of the Philippines">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#070C1B"/>
+      <stop offset="100%" stop-color="#04060F"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFF4D2" stop-opacity=".95"/>
+      <stop offset="26%" stop-color="#F7C548" stop-opacity=".55"/>
+      <stop offset="62%" stop-color="#E07B2A" stop-opacity=".16"/>
+      <stop offset="100%" stop-color="#E07B2A" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFE9B8"/>
+      <stop offset="55%" stop-color="#F0C35C"/>
+      <stop offset="100%" stop-color="#C8963C"/>
+    </linearGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="45%" stop-color="#ffffff" stop-opacity=".55"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <mask id="shaftfade"><rect width="1280" height="400" fill="url(#fade)"/></mask>
+  </defs>
+
+  <rect width="1280" height="400" fill="url(#sky)"/>
+
+  <!-- survey grid -->
+  <g stroke="#8FB6FF" stroke-opacity=".07" stroke-width="1">
+    <path d="M0 300h1280M0 330h1280M0 366h1280"/>
+    <path d="M640 288 L120 400M640 288 L400 400M640 288 L880 400M640 288 L1160 400"/>
+  </g>
+
+  <!-- the eight-rayed sun -->
+  <circle cx="640" cy="196" r="190" fill="url(#sun)"/>
+  <g fill="#F7C548" fill-opacity=".5" transform="translate(640 196)">
+    <g id="ray"><path d="M0 -34 L11 -34 L0 -132 L-11 -34 Z"/></g>
+    <use href="#ray" transform="rotate(45)"/><use href="#ray" transform="rotate(90)"/>
+    <use href="#ray" transform="rotate(135)"/><use href="#ray" transform="rotate(180)"/>
+    <use href="#ray" transform="rotate(225)"/><use href="#ray" transform="rotate(270)"/>
+    <use href="#ray" transform="rotate(315)"/>
+  </g>
+  <circle cx="640" cy="196" r="30" fill="#FFDE8E" fill-opacity=".8"/>
+
+  <!-- twenty-two shafts, one per section, coloured by movement -->
+  <g mask="url(#shaftfade)">
+    <g opacity=".85">
+      <rect x="64"  y="120" width="9" height="190" rx="4" fill="#F6E7C4"/>
+      <rect x="98"  y="132" width="9" height="176" rx="4" fill="#7EC6DC"/>
+      <rect x="132" y="126" width="9" height="184" rx="4" fill="#7EC6DC"/>
+      <rect x="166" y="140" width="9" height="168" rx="4" fill="#F2C45E"/>
+      <rect x="200" y="122" width="9" height="188" rx="4" fill="#F2C45E"/>
+      <rect x="234" y="136" width="9" height="172" rx="4" fill="#86CDAE"/>
+      <rect x="268" y="128" width="9" height="182" rx="4" fill="#86CDAE"/>
+      <rect x="302" y="144" width="9" height="164" rx="4" fill="#86CDAE"/>
+      <rect x="336" y="124" width="9" height="186" rx="4" fill="#A99BDA"/>
+      <rect x="370" y="138" width="9" height="170" rx="4" fill="#A99BDA"/>
+      <rect x="404" y="130" width="9" height="180" rx="4" fill="#D98FA6"/>
+      <rect x="867" y="126" width="9" height="184" rx="4" fill="#7C9DE0"/>
+      <rect x="901" y="140" width="9" height="168" rx="4" fill="#7C9DE0"/>
+      <rect x="935" y="122" width="9" height="188" rx="4" fill="#7C9DE0"/>
+      <rect x="969" y="134" width="9" height="176" rx="4" fill="#7C9DE0"/>
+      <rect x="1003" y="128" width="9" height="182" rx="4" fill="#7C9DE0"/>
+      <rect x="1037" y="142" width="9" height="166" rx="4" fill="#7C9DE0"/>
+      <rect x="1071" y="124" width="9" height="186" rx="4" fill="#E3906A"/>
+      <rect x="1105" y="136" width="9" height="172" rx="4" fill="#E3906A"/>
+      <rect x="1139" y="130" width="9" height="180" rx="4" fill="#E3906A"/>
+      <rect x="1173" y="120" width="9" height="190" rx="4" fill="#BFC96A"/>
+      <rect x="1207" y="134" width="9" height="176" rx="4" fill="#BFC96A"/>
+    </g>
+  </g>
+
+  <!-- wordmark -->
+  <text x="640" y="182" text-anchor="middle" font-family="Georgia, 'Iowan Old Style', serif"
+        font-size="86" letter-spacing="22" fill="url(#gold)">III</text>
+  <text x="640" y="234" text-anchor="middle" font-family="Georgia, 'Iowan Old Style', serif"
+        font-size="15" letter-spacing="13" fill="#8A93AC">A R T I C L E &#160; T H R E E</text>
+  <text x="640" y="272" text-anchor="middle" font-family="Georgia, 'Iowan Old Style', serif"
+        font-size="27" letter-spacing="2" fill="#F5F2EA">The Bill of Rights of the Philippines</text>
+  <text x="640" y="302" text-anchor="middle" font-family="Helvetica, Arial, sans-serif"
+        font-size="11" letter-spacing="5.5" fill="#59617A">TWENTY-TWO SECTIONS &#183; NINE MOVEMENTS &#183; RATIFIED 2 FEBRUARY 1987</text>
+</svg>

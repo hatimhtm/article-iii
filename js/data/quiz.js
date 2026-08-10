@@ -1,0 +1,116 @@
+/**
+ * Recall practice. Scenario in, section out.
+ * `a` is the index into `options` of the correct answer.
+ */
+export const QUIZ = [
+  {
+    q: 'Police at a checkpoint order a passenger to open his bag. There is no warrant, no consent, and nothing visible from outside. They find contraband.',
+    options: ['Section 2', 'Section 12', 'Section 17', 'Section 21'],
+    a: 0,
+    why: 'This is an unreasonable search. The contraband is inadmissible under §3(2) — but the right violated is the one in §2, which requires a warrant issued personally by a judge, or one of the recognised warrantless exceptions. None applies here.',
+    s: 2,
+  },
+  {
+    q: 'A suspect is held overnight and signs a confession at 3 a.m. A lawyer is called in only to sign the last page of the finished statement.',
+    options: ['Section 14', 'Section 12', 'Section 13', 'Section 16'],
+    a: 1,
+    why: '§12(1) requires <em>competent and independent counsel</em>, and a waiver of the right must be in writing <em>and in the presence of counsel</em>. A lawyer summoned to witness a signature has not assisted. The confession is inadmissible under §12(3).',
+    s: 12,
+  },
+  {
+    q: 'A government agency puts a citizen on a travel watchlist under its own internal circular. No criminal case has been filed against her.',
+    options: ['Section 6', 'Section 1', 'Section 4', 'Section 15'],
+    a: 0,
+    why: '§6 allows the right to travel to be impaired only for national security, public safety or public health, <em>as may be provided by law</em>. An agency circular is not a law. This is the holding of Genuino v. De Lima (2018).',
+    s: 6,
+  },
+  {
+    q: 'A graft complaint sits at the Ombudsman for six years before an Information is finally filed in court.',
+    options: ['Section 14', 'Section 16', 'Section 21', 'Section 13'],
+    a: 1,
+    why: '§14(2) covers speedy <em>trial</em> in criminal prosecutions. Delay during preliminary investigation before a quasi-judicial body falls under §16, the broader right to speedy <em>disposition</em>. Cagang v. Sandiganbayan (2018) supplies the framework.',
+    s: 16,
+  },
+  {
+    q: 'A driver is convicted under a city traffic ordinance for a collision. The prosecutor then files a Revised Penal Code case over the same crash.',
+    options: ['Section 22', 'Section 14', 'Section 21', 'Section 1'],
+    a: 2,
+    why: 'The second sentence of §21: where a single act is punished by both a law and an ordinance, conviction or acquittal under either bars prosecution under the other. See People v. Relova (1987).',
+    s: 21,
+  },
+  {
+    q: 'An accused is ordered to give a blood sample and, separately, to write out a specimen of his handwriting for comparison.',
+    options: [
+      'Both are compellable',
+      'Neither is compellable',
+      'The blood sample is compellable; the handwriting is not',
+      'The handwriting is compellable; the blood sample is not',
+    ],
+    a: 2,
+    why: '§17 protects against <em>testimonial</em> compulsion. The body is object evidence (Villaflor v. Summers). Writing requires the use of the mind, so it cannot be compelled (Beltran v. Samson).',
+    s: 17,
+  },
+  {
+    q: 'Congress passes a law raising the penalty for an offence, and prosecutors seek to apply it to an act committed the previous year.',
+    options: ['Section 22', 'Section 19', 'Section 10', 'Section 20'],
+    a: 0,
+    why: '§22 forbids ex post facto laws. Inflicting a greater punishment than the law annexed to the crime when it was committed is the third of the six kinds listed in In re Kay Villegas Kami (1970).',
+    s: 22,
+  },
+  {
+    q: 'A resident asks the barangay for a copy of the contract behind a ₱4 million covered court. The barangay refuses, saying she has no personal interest in it.',
+    options: ['Section 8', 'Section 7', 'Section 11', 'Section 4'],
+    a: 1,
+    why: '§7 is self-executing and requires no showing of personal interest (Legaspi v. CSC, 1987). A public works contract paid from public funds is the paradigm matter of public concern.',
+    s: 7,
+  },
+  {
+    q: 'A recruiter holds a worker\'s passport until she has "worked off" her placement fee.',
+    options: ['Section 20', 'Section 18', 'Section 9', 'Section 10'],
+    a: 1,
+    why: '§18(2) prohibits involuntary servitude in any form. Compare Caunca v. Salazar (1949). Note that §20 does <em>not</em> apply — nobody is being imprisoned; she is being made to work.',
+    s: 18,
+  },
+  {
+    q: 'A city government takes two metres of frontage from a family\'s lot for road widening, and sets compensation using its own assessor\'s schedule.',
+    options: ['Section 10', 'Section 9', 'Section 1', 'Section 11'],
+    a: 1,
+    why: '§9 requires just compensation, and EPZA v. Dulay (1987) holds that determining it is a judicial function. An administratively fixed figure cannot bind the owner or the court.',
+    s: 9,
+  },
+  {
+    q: 'A public school expels students who refuse, on religious grounds, to salute the flag.',
+    options: ['Section 4', 'Section 5', 'Section 1', 'Section 8'],
+    a: 1,
+    why: '§5, free exercise. Ebralinag v. Division Superintendent of Schools (1993) held that Jehovah\'s Witness students cannot be expelled for this, reversing the earlier Gerona ruling.',
+    s: 5,
+  },
+  {
+    q: 'A person earning ₱18,000 a month is charged with estafa. Bail is set at ₱2,000,000.',
+    options: ['Section 13', 'Section 19', 'Section 14', 'Section 1'],
+    a: 0,
+    why: '§13, last sentence: excessive bail shall not be required. Bail set without reference to the accused\'s means is a denial of the right disguised as a grant of it. Compare De la Camara v. Enage (1971).',
+    s: 13,
+  },
+  {
+    q: 'The government privately warns broadcasters that airing a leaked recording could cost them their franchises.',
+    options: ['Section 3', 'Section 7', 'Section 4', 'Section 5'],
+    a: 2,
+    why: '§4. A threat that deters publication before it happens is prior restraint, which carries a heavy presumption of invalidity. This is Chavez v. Gonzales (2008), the "Hello Garci" case.',
+    s: 4,
+  },
+  {
+    q: 'A family cannot locate a relative taken by armed men. The authorities simply deny having him in custody.',
+    options: ['Section 15', 'Section 12', 'Section 18', 'Section 2'],
+    a: 0,
+    why: '§15, the writ of habeas corpus — though a bare denial of custody would end that inquiry, which is exactly why the Supreme Court created the writ of <em>amparo</em> in 2007 to reach enforced disappearances.',
+    s: 15,
+  },
+  {
+    q: 'A domestic worker cannot afford the filing fee to sue for two years of unpaid wages.',
+    options: ['Section 11', 'Section 8', 'Section 14', 'Section 16'],
+    a: 0,
+    why: '§11. Free access to the courts may not be denied by reason of poverty. She applies to litigate as an indigent under Rule 141 §19; the fees become a lien on any judgment she wins.',
+    s: 11,
+  },
+];

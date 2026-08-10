@@ -1,0 +1,70 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Every module referenced by the import map exists
+        run: |
+          test -f vendor/three.module.js
+          test -f vendor/three.core.js
+          for f in EffectComposer Pass ShaderPass MaskPass RenderPass UnrealBloomPass OutputPass; do
+            test -f "vendor/addons/postprocessing/$f.js"
+          done
+          for f in CopyShader LuminosityHighPassShader OutputShader; do
+            test -f "vendor/addons/shaders/$f.js"
+          done
+
+      - name: All 22 sections are present and carry their commentary
+        run: |
+          node --input-type=module -e "
+            import fs from 'node:fs';
+            const src = fs.readFileSync('js/data/sections.js', 'utf8');
+            const ns = [...src.matchAll(/^\s{4}n: (\d+),$/gm)].map(m => +m[1]);
+            const expected = Array.from({length: 22}, (_, i) => i + 1);
+            if (JSON.stringify(ns) !== JSON.stringify(expected)) {
+              throw new Error('sections are not 1..22 in order: ' + ns.join(','));
+            }
+            for (const key of ['plain:', 'why:', 'doctrines:', 'cases:', 'real:', 'limits:']) {
+              const n = src.split('\n' + '    ' + key).length - 1;
+              if (n !== 22) throw new Error(key + ' appears ' + n + ' times, expected 22');
+            }
+            console.log('22 sections, all fields present');
+          "
+
+      - name: Entry point is wired up
+        run: |
+          grep -q 'js/main.js' index.html
+          grep -q '"three": "./vendor/three.module.js"' index.html
+          test -f .nojekyll
+
+  deploy:
+    needs: verify
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v4
