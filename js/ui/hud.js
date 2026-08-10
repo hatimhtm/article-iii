@@ -3,6 +3,7 @@ import { CLUSTERS, CLUSTER_ORDER } from '../data/clusters.js';
 import { state } from '../core/state.js';
 import { goToSection, goToProgress, step, goToPhase } from '../core/scroll.js';
 import { make, clamp } from '../core/util.js';
+import { readState } from '../core/read.js';
 
 export function createHud(root, actions) {
   const bar = make('header', 'hud hud--top', `
@@ -10,7 +11,10 @@ export function createHud(root, actions) {
       <span class="mark__num">III</span>
       <span class="mark__txt"><b>Article III</b><i>Bill of Rights · 1987</i></span>
     </button>
-    <div class="hud__mid"><span class="hud__phase"></span></div>
+    <div class="hud__mid">
+      <span class="hud__phase"></span>
+      <span class="hud__read" title="Sections you have read"><i></i><b>0</b>/22</span>
+    </div>
     <nav class="hud__tools">
       <button type="button" data-act="map" title="Map of all 22 sections (M)"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Map</span></button>
       <button type="button" data-act="quiz" title="Test yourself (T)"><svg viewBox="0 0 24 24"><path d="M9 9a3 3 0 114 2.8V13"/><circle cx="12" cy="17" r="1"/></svg><span>Test</span></button>
@@ -54,6 +58,15 @@ export function createHud(root, actions) {
   const phaseLabel = bar.querySelector('.hud__phase');
   const posLabel = foot.querySelector('.hud__poslabel');
   const posBar = foot.querySelector('.hud__bar i');
+  const readCount = bar.querySelector('.hud__read b');
+
+  const paintRead = () => {
+    readCount.textContent = String(readState.size);
+    bar.querySelector('.hud__read').classList.toggle('is-done', readState.size === 22);
+    ticks.forEach((t, i) => t.classList.toggle('is-read', readState.has(i + 1)));
+  };
+  readState.onChange(paintRead);
+  paintRead();
 
   ticks.forEach((t) => t.addEventListener('click', () => goToSection(+t.dataset.go)));
 

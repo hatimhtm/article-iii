@@ -15,6 +15,9 @@ const GradeShader = {
     uGrain: { value: 0.035 },
     uFade: { value: 0.0 },     // 0 = normal, 1 = black
     uWarm: { value: 0.0 },
+    uFlash: { value: 0.0 },    // impulse — the tarmac, 21 August 1983
+    uDread: { value: 0.0 },    // desaturate and push toward iron and blood
+    uShake: { value: 0.0 },
   },
   vertexShader: /* glsl */ `
     varying vec2 vUv;
@@ -25,7 +28,7 @@ const GradeShader = {
   `,
   fragmentShader: /* glsl */ `
     uniform sampler2D tDiffuse;
-    uniform float uTime, uAberration, uVignette, uGrain, uFade, uWarm;
+    uniform float uTime, uAberration, uVignette, uGrain, uFade, uWarm, uFlash, uDread, uShake;
     varying vec2 vUv;
 
     float hash(vec2 p) {
@@ -33,23 +36,38 @@ const GradeShader = {
     }
 
     void main() {
-      vec2 c = vUv - 0.5;
+      vec2 uv = vUv;
+      // an unsteady hand during the martial-law beats
+      if (uShake > 0.001) {
+        uv.x += sin(uTime * 27.0) * 0.0016 * uShake;
+        uv.y += sin(uTime * 19.0 + 1.7) * 0.0013 * uShake;
+      }
+      vec2 c = uv - 0.5;
       float r2 = dot(c, c);
 
       // chromatic aberration grows toward the corners
       float k = uAberration * (0.35 + r2 * 3.0);
       vec3 col;
-      col.r = texture2D(tDiffuse, vUv - c * k).r;
-      col.g = texture2D(tDiffuse, vUv).g;
-      col.b = texture2D(tDiffuse, vUv + c * k).b;
+      col.r = texture2D(tDiffuse, uv - c * k).r;
+      col.g = texture2D(tDiffuse, uv).g;
+      col.b = texture2D(tDiffuse, uv + c * k).b;
 
       // warm the highlights very slightly — gold, not orange
       col = mix(col, col * vec3(1.05, 1.0, 0.93), uWarm);
 
+      if (uDread > 0.001) {
+        float lum = dot(col, vec3(0.2126, 0.7152, 0.0722));
+        vec3 iron = mix(vec3(lum), col, 0.42) * vec3(1.14, 0.86, 0.80);
+        col = mix(col, iron, uDread);
+      }
+
       float vig = 1.0 - uVignette * smoothstep(0.18, 0.78, r2);
       col *= vig;
 
-      float g = hash(vUv * vec2(1024.0, 768.0) + fract(uTime) * 91.7) - 0.5;
+      // the flash blooms from the centre and drains outward
+      col += vec3(1.0, 0.97, 0.92) * uFlash * (0.35 + 0.9 * exp(-r2 * 3.0));
+
+      float g = hash(uv * vec2(1024.0, 768.0) + fract(uTime) * 91.7) - 0.5;
       col += g * uGrain * (0.4 + 0.6 * (1.0 - vig));
 
       col *= (1.0 - uFade);

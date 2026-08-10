@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { state, COUNTS, phaseAt, sectionCoord } from '../core/state.js';
 import { SECTIONS } from '../data/sections.js';
 import { CLUSTERS } from '../data/clusters.js';
+import { MOTIF_FIELD } from '../data/motifs.js';
 import { clamp, lerp, damp, band, smoothstep, invLerp } from '../core/util.js';
 import {
   frameAt, progressToK, epilogueCamera, assemblyAmount, SUN_POS, LAT_MAIN,
@@ -61,6 +62,17 @@ export function createWorld(canvas) {
   let sunLevel = 0.5;
   let warmth = 0.25;
   let reveal = 0;
+  let dread = 0;
+  let flash = 0;
+  let roll = 0;
+  let ringT = 1;
+  let lastActive = -1;
+  let firedFlash = false;
+  let field = { pull: 0.3, turb: 1, rise: 1 };
+  const raycaster = new THREE.Raycaster();
+  const ndc = new THREE.Vector2();
+  let hovered = -1;
+  let pickTick = 0;
 
   camera.position.set(0, 3, 200);
 
@@ -136,8 +148,14 @@ export function createWorld(canvas) {
       camPos.y += py * 3;
     }
 
+    // bank into the turn, and let the lens breathe with speed — the two cues
+    // that separate "a camera on a rail" from "travelling"
+    const lateral = (camAim.x - camPos.x) * 0.06 + state.velocity * 26;
+    roll = damp(roll, state.reducedMotion ? 0 : clamp(lateral, -1, 1) * 0.055, 0.002, dt);
+    camera.up.set(Math.sin(roll), Math.cos(roll), 0);
     camera.position.copy(camPos);
     camera.lookAt(camAim);
+    targetFov += state.reducedMotion ? 0 : Math.min(Math.abs(state.velocity) * 22, 5.5);
     smoothFov = damp(smoothFov, targetFov, 0.001, dt);
     if (Math.abs(camera.fov - smoothFov) > 0.01) {
       camera.fov = smoothFov;
@@ -146,6 +164,7 @@ export function createWorld(canvas) {
 
     /* mood --------------------------------------------------------- */
     let targetWake = 0;
+    let targetDread = 0;
     let targetSun = 0.55;
     let targetWarm = 0.3;
     let targetReveal = 1;
@@ -156,6 +175,10 @@ export function createWorld(canvas) {
       targetReveal = 0;             // the colonnade is not there yet
     } else if (name === 'prologue') {
       // the article's own history: dark, then the turn, then light
+      targetDread = 1 - band(local, 0.26, 0.58);
+      // beat 3 of 7 — Ninoy Aquino on the tarmac, 21 August 1983
+      if (!firedFlash && local > 0.345 && local < 0.42) { flash = 1; firedFlash = true; }
+      if (local < 0.30 || local > 0.50) firedFlash = false;
       targetWake = band(local, 0.5, 1.0) * 0.5;
       targetSun = lerp(0.12, 0.92, band(local, 0.3, 0.95));
       targetWarm = band(local, 0.4, 1.0);
@@ -174,6 +197,8 @@ export function createWorld(canvas) {
     sunLevel = damp(sunLevel, targetSun, 0.02, dt);
     warmth = damp(warmth, targetWarm, 0.02, dt);
     reveal = damp(reveal, targetReveal, 0.015, dt);
+    dread = damp(dread, targetDread, 0.02, dt);
+    flash = Math.max(0, flash - dt * 1.35);
     monoliths.setReveal(reveal);
     // in the epilogue the shafts are ~900 units out; the avenue's haze would
     // erase them, so push it far back as the ring assembles
@@ -193,7 +218,35 @@ export function createWorld(canvas) {
     else if (name === 'colonnade' || name === 'epilogue') focus.copy(active.node.position);
     else focus.copy(camPos).addScaledVector(f0.fwd || new THREE.Vector3(0, 0, -1), 60);
 
-    monoliths.update(t, coord, assembly, wake);
+    const activeIdx = clamp(Math.round(coord), 0, SECTIONS.length - 1);
+    if (activeIdx !== lastActive) {
+      if (lastActive >= 0 && name === 'colonnade') ringT = 0;
+      lastActive = activeIdx;
+      const f = MOTIF_FIELD[SECTIONS[activeIdx].motif];
+      if (f) field = f;
+    }
+    ringT = Math.min(1, ringT + dt * 0.9);
+
+    /* pointer picking — the shafts are objects, not wallpaper */
+    if (!state.isCoarse && name === 'colonnade' && !state.spread && ++pickTick % 3 === 0) {
+      ndc.set(state.pointer.tx, state.pointer.ty);
+      raycaster.setFromCamera(ndc, camera);
+      const hit = raycaster.intersectObjects(monoliths.pickables, false)[0];
+      const idx = hit ? monoliths.pickables.indexOf(hit.object) : -1;
+      if (idx !== hovered) {
+        hovered = idx;
+        canvas.style.cursor = idx >= 0 ? 'pointer' : '';
+      }
+    } else if (hovered !== -1 && (state.isCoarse || name !== 'colonnade' || state.spread)) {
+      hovered = -1;
+      canvas.style.cursor = '';
+    }
+
+    // once the ring has landed, light walks it from §1 round to §22
+    const seqLocal = name === 'epilogue' ? clamp((local - 0.64) / 0.30) : -1;
+    const sequence = seqLocal > 0 && seqLocal < 1 ? seqLocal * SECTIONS.length : -1;
+
+    monoliths.update(t, coord, assembly, wake, { hovered, dt, sequence });
 
     /* particles ---------------------------------------------------- */
     stars.uniforms.uTime.value = t;
@@ -203,10 +256,14 @@ export function createWorld(canvas) {
     dust.uniforms.uTime.value = t;
     dust.uniforms.uCam.value.copy(camera.position);
     dust.uniforms.uFocus.value.copy(focus);
-    dust.uniforms.uPull.value =
-      name === 'colonnade' ? 0.28 + Math.abs(state.velocity) * 6 : 0.05;
-    dust.uniforms.uTurb.value = state.reducedMotion ? 0.25 : 1;
-    dust.uniforms.uOpacity.value = lerp(0.4, 1.0, wake);
+    const motion = state.reducedMotion ? 0.3 : 1;
+    dust.uniforms.uPull.value = name === 'colonnade'
+      ? field.pull + Math.sign(field.pull || 1) * Math.abs(state.velocity) * 5
+      : lerp(0.05, 0.02, dread);
+    dust.uniforms.uTurb.value = lerp(field.turb, 0.55, dread) * motion;
+    dust.uniforms.uRise.value = lerp(field.rise, -1.35, dread);   // ash falls
+    dust.uniforms.uAsh.value = dread;
+    dust.uniforms.uOpacity.value = lerp(0.4, 1.0, wake) * lerp(1, 3.4, dread);
     dust.uniforms.uAccent.value.copy(accent);
 
     ground.uniforms.uTime.value = t;
@@ -214,6 +271,8 @@ export function createWorld(canvas) {
     ground.uniforms.uFocus.value.copy(focus);
     ground.uniforms.uAccent.value.copy(accent);
     ground.uniforms.uWake.value = wake;
+    ground.uniforms.uRing.value = ringT;
+    ground.uniforms.uDread.value = dread;
 
     /* grade -------------------------------------------------------- */
     const g = post.grade.uniforms;
@@ -223,7 +282,11 @@ export function createWorld(canvas) {
     g.uAberration.value = state.reducedMotion
       ? 0
       : 0.00035 + Math.min(Math.abs(state.velocity) * 0.5, 0.0022);
-    g.uGrain.value = state.reducedMotion ? 0.010 : 0.024;
+    g.uGrain.value = (state.reducedMotion ? 0.010 : 0.024) + dread * 0.045;
+    g.uDread.value = dread;
+    g.uFlash.value = flash * flash;
+    g.uShake.value = state.reducedMotion ? 0 : dread * 0.8;
+    g.uVignette.value += dread * 0.55;
 
     if (post.bloom) {
       post.bloom.strength = lerp(0.34, 0.56, wake) + assembly * 0.18;
@@ -235,6 +298,7 @@ export function createWorld(canvas) {
   return {
     renderer, scene, camera, setSize, update,
     accent,
+    hovered: () => hovered,
     dispose() {
       renderer.dispose();
       post.composer.dispose?.();

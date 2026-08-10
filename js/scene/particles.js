@@ -111,6 +111,8 @@ export function createDust(count, hazeColor) {
     uBase: { value: new THREE.Color('#CBD9F5') },
     uOpacity: { value: 1 },
     uTurb: { value: 1 },
+    uRise: { value: 1 },        // <0 = the field falls, like ash
+    uAsh: { value: 0 },
     ...hazeUniforms(hazeColor, 200, 620),
   };
 
@@ -123,7 +125,7 @@ export function createDust(count, hazeColor) {
       blending: THREE.AdditiveBlending,
       vertexShader: /* glsl */ `
         attribute float aSeed, aSize;
-        uniform float uTime, uPixelRatio, uPull, uTurb;
+        uniform float uTime, uPixelRatio, uPull, uTurb, uRise;
         uniform vec3 uCell, uCam, uFocus;
         varying float vFade;
         varying float vSeed;
@@ -133,15 +135,16 @@ export function createDust(count, hazeColor) {
           vSeed = aSeed;
           vec3 base = position;
           // slow convection, then tile the cell around the camera
-          base.y += uTime * (1.4 + aSeed * 2.2) * uTurb;
+          base.y += uTime * (1.4 + aSeed * 2.2) * uTurb * uRise;
           base.x += sin(uTime * 0.24 + aSeed * 6.283) * 5.0 * uTurb;
           base.z += cos(uTime * 0.19 + aSeed * 4.1) * 5.0 * uTurb;
 
           vec3 w = base - uCell * floor((base - uCam) / uCell + 0.5);
           vec3 rel = w - uCam;
 
-          // drawn toward the lit shaft
-          if (uPull > 0.001) {
+          // drawn toward the lit shaft — or pushed off it, when the section's
+          // signature is one of projection rather than scrutiny
+          if (abs(uPull) > 0.001) {
             vec3 d = uFocus - w;
             float len = max(length(d), 1.0);
             w += (d / len) * uPull * min(len * 0.28, 26.0);
@@ -162,7 +165,7 @@ export function createDust(count, hazeColor) {
       fragmentShader: /* glsl */ `
         ${HAZE}
         uniform vec3 uAccent, uBase;
-        uniform float uOpacity, uTime;
+        uniform float uOpacity, uTime, uAsh;
         varying float vFade;
         varying float vSeed;
         varying float vDist;
@@ -171,10 +174,11 @@ export function createDust(count, hazeColor) {
           float r = dot(uv, uv);
           if (r > 1.0) discard;
           float tw = 0.6 + 0.4 * sin(uTime * 1.6 + vSeed * 31.0);
-          float a = exp(-r * 3.6) * vFade * uOpacity * tw * 0.75;
+          float a = exp(-r * 3.6) * vFade * uOpacity * mix(tw, 0.85, uAsh) * 0.75;
           a *= 1.0 - hazeAmount(vDist);
           if (a < 0.004) discard;
           vec3 c = mix(uBase, uAccent, smoothstep(0.35, 0.9, vSeed));
+          c = mix(c, vec3(0.66, 0.58, 0.53), uAsh);
           gl_FragColor = vec4(c * a * 1.6, a);
         }
       `,

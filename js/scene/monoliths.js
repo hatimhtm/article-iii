@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 import { SECTIONS } from '../data/sections.js';
+import { MOTIF_ID } from '../data/motifs.js';
 import { CLUSTERS } from '../data/clusters.js';
 import { buildPlacements, RING_STRETCH, RING_GIRTH, SUN_POS } from './layout.js';
 import { NOISE, HAZE } from './glsl.js';
-import { clamp } from '../core/util.js';
+import { clamp, damp } from '../core/util.js';
 
 /**
  * One hexagonal shaft per section. The height of the bright band on each
@@ -18,10 +19,12 @@ const BODY_VS = /* glsl */ `
   varying vec3 vNormalW;
   varying vec3 vViewDir;
   varying vec3 vW;
+  varying vec3 vLocal;
   varying float vH;
   varying float vDist;
   void main() {
     vH = position.y + 0.5;
+    vLocal = position;
     vec3 p = position;
     // a slow breathing sway, stronger when the shaft is lit
     float sway = sin(uTime * 0.6 + uSeed * 3.1 + vH * 2.0) * 0.012 * (0.4 + uCharge);
@@ -47,12 +50,62 @@ const BODY_FS = /* glsl */ `
   uniform float uMark;
   uniform float uSeed;
   uniform float uReveal;
+  uniform float uMotif;
+  uniform float uIgnite;
+  uniform float uHover;
   uniform vec3 uSun;
   varying vec3 vNormalW;
   varying vec3 vViewDir;
   varying vec3 vW;
+  varying vec3 vLocal;
   varying float vH;
   varying float vDist;
+
+  /* ── the seven signatures ───────────────────────────────────────────
+     h runs 0 at the foot to 1 at the crown, ang runs around the shaft.
+     A motif may return a negative value: carve and cage take light away,
+     which is the whole point of them. */
+  float motif(float h, float ang, float t, float mark, float seed) {
+    int m = int(uMotif + 0.5);
+
+    if (m == 0) {                       // FOUNDATION — two clauses, breathing
+      float b1 = exp(-pow((h - 0.40) * 22.0, 2.0));
+      float b2 = exp(-pow((h - 0.60) * 22.0, 2.0));
+      return (b1 + b2) * (0.62 + 0.38 * sin(t * 0.7));
+    }
+    if (m == 1) {                       // SCAN — a light looking through it
+      float sweep = fract(t * 0.28 + seed);
+      float line = exp(-pow((h - sweep) * 26.0, 2.0));
+      float rules = smoothstep(0.88, 1.0, fract(h * 13.0)) * 0.09;
+      return line * 1.25 + rules;
+    }
+    if (m == 2) {                       // BROADCAST — rings leaving the mark
+      float d = abs(h - mark);
+      float ring = pow(max(0.0, sin(d * 24.0 - t * 2.2)), 7.0);
+      return ring * exp(-d * 3.6) * 1.25;
+    }
+    if (m == 3) {                       // CARVE — a wedge taken away
+      float w = cos(ang - t * 0.30);
+      float cut = smoothstep(0.52, 0.94, w);
+      float edge = exp(-pow((w - 0.52) * 9.0, 2.0));
+      return -cut * 0.78 + edge * 0.5;
+    }
+    if (m == 4) {                       // CAGE — bars, interior held dark
+      float bars = pow(abs(cos(ang * 5.0)), 9.0);
+      float breath = 0.62 + 0.38 * sin(t * 1.1 + seed * 5.0);
+      return bars * 0.62 * breath - (1.0 - bars) * 0.30;
+    }
+    if (m == 5) {                       // FRACTURE — cracks lit from inside
+      float n = noise3(vec3(ang * 1.5, h * 4.6, seed * 3.0));
+      float crack = smoothstep(0.455, 0.500, n) * (1.0 - smoothstep(0.500, 0.545, n));
+      return crack * 1.9 * (0.66 + 0.34 * sin(t * 2.6 + seed * 8.0));
+    }
+                                        // BALANCE — two marks weighed
+    float o = 0.125 * (0.5 + 0.5 * sin(t * 0.62 + seed * 2.0));
+    float b1 = exp(-pow((h - (mark - o)) * 27.0, 2.0));
+    float b2 = exp(-pow((h - (mark + o)) * 27.0, 2.0));
+    return (b1 + b2) * 0.95;
+  }
 
   void main() {
     vec3 N = normalize(vNormalW);
@@ -78,20 +131,34 @@ const BODY_FS = /* glsl */ `
     // a travelling pulse of light, only while the shaft is charged
     float travel = exp(-pow((vH - fract(uTime * 0.16 + uSeed)) * 11.0, 2.0)) * uCharge;
 
+    float ang = atan(vLocal.z, vLocal.x);
+    // the fine patterns alias badly once a shaft is far enough to be a few
+    // pixels wide, so they only exist where they can actually be read
+    float mo = motif(vH, ang, uTime, uMark, uSeed) * smoothstep(230.0, 95.0, vDist);
+
+    // arrival: a wave of light climbs the shaft the moment it takes the stage
+    float wavePos = uIgnite * 1.3 - 0.15;
+    float wave = exp(-pow((vH - wavePos) * 6.5, 2.0)) * (1.0 - uIgnite);
+
     vec3 c = uBody;
     c += uColor2 * wrap * (0.26 + uCharge * 0.34);
     c += vec3(1.0, 0.84, 0.58) * kiss * (0.06 + uCharge * 0.20);
     c += uColor2 * fres * (0.24 + uCharge * 0.60);
     c += uColor * band * (0.14 + uCharge * 0.42);
     c += uColor * line * (0.22 + uCharge * 0.75);
-    c += uColor * travel * 0.30;
+    c += uColor * mo * (0.10 + uCharge * 0.60 + uHover * 0.25);
+    c += uColor * travel * 0.24;
+    c += vec3(1.0, 0.94, 0.82) * wave * 1.1;
     c *= 0.55 + grain * 0.6;
 
     float a = 0.10 + fres * 0.46 + wrap * 0.13 + kiss * 0.10
             + band * (0.13 + uCharge * 0.20)
             + line * (0.16 + uCharge * 0.24)
-            + travel * 0.16;
-    a *= (0.30 + uCharge * 0.55) * uReveal;
+            + max(mo, 0.0) * (0.07 + uCharge * 0.26)
+            + wave * 0.4
+            + travel * 0.14;
+    a += mo < 0.0 ? mo * 0.16 * uCharge : 0.0;
+    a *= (0.30 + uCharge * 0.55 + uHover * 0.20) * uReveal;
 
     float hz = hazeAmount(vDist);
     c = mix(c, uHazeColor, hz);
@@ -169,6 +236,9 @@ export function createMonoliths(hazeColor) {
       uBody: { value: bodyColor.clone() },
       uMark: { value: 0.1 + (i / (SECTIONS.length - 1)) * 0.8 },
       uSeed: { value: i * 0.618 },
+      uMotif: { value: MOTIF_ID[sec.motif] ?? 0 },
+      uIgnite: { value: 1 },
+      uHover: { value: 0 },
       uReveal: reveal,
       uSun: sunRef,
       ...haze(),
@@ -227,6 +297,9 @@ export function createMonoliths(hazeColor) {
       height: pl.height,
       radius: pl.radius,
       pos: node.position,
+      body,
+      igniteAt: -99,
+      hover: 0,
     });
   });
 
@@ -242,6 +315,9 @@ export function createMonoliths(hazeColor) {
       uBody: { value: bodyColor.clone() },
       uMark: { value: -1 },
       uSeed: { value: i * 0.37 + 5 },
+      uMotif: { value: 1 },
+      uIgnite: { value: 1 },
+      uHover: { value: 0 },
       uReveal: reveal,
       uSun: sunRef,
       ...haze(),
@@ -266,6 +342,7 @@ export function createMonoliths(hazeColor) {
 
   const _p = new THREE.Vector3();
   const _q = new THREE.Quaternion();
+  let lastActive = -1;
 
   return {
     group,
@@ -273,22 +350,40 @@ export function createMonoliths(hazeColor) {
     /** 0 = the colonnade is not there at all, 1 = fully present */
     setReveal(v) { reveal.value = v; },
     setHazeRange(near, far) { hazeRange.value.set(near, far); },
+    /** meshes the pointer can hit */
+    pickables: items.map((it) => it.body),
     /**
      * @param t        elapsed seconds
      * @param coord    continuous section coordinate (may be outside 0..21)
      * @param assembly 0 = avenue, 1 = folded into the sun's ring
      * @param wake     0..1 global "the article is alive" level
      */
-    update(t, coord, assembly, wake) {
+    update(t, coord, assembly, wake, opts = {}) {
       const folding = assembly > 0.0001;
+      const active = clamp(Math.round(coord), 0, items.length - 1);
+      if (active !== lastActive) {
+        // fire an arrival event rather than merely ramping a brightness
+        if (lastActive >= 0) items[active].igniteAt = t;
+        lastActive = active;
+      }
+      // once the ring has landed, walk light around it, §1 to §22
+      const seq = opts.sequence ?? -1;
+
       for (const it of items) {
         const d = Math.abs(it.index - coord);
         let charge = clamp(1 - d / 1.9);
         charge = charge * charge * (3 - 2 * charge);
         charge = Math.max(charge, wake * 0.22);
         if (folding) charge = Math.max(charge, assembly * 0.85);
+        if (seq >= 0) {
+          const sd = Math.abs(it.index - seq);
+          charge = Math.max(charge, clamp(1 - sd / 1.4));
+        }
         it.uniforms.uCharge.value = charge;
         it.uniforms.uTime.value = t;
+        it.uniforms.uIgnite.value = clamp((t - it.igniteAt) / 1.05);
+        it.hover = damp(it.hover, it.index === opts.hovered ? 1 : 0, 0.0005, opts.dt || 0.016);
+        it.uniforms.uHover.value = it.hover;
 
         if (folding) {
           // stagger so the shafts arrive in order, §1 first
@@ -305,10 +400,14 @@ export function createMonoliths(hazeColor) {
             it.height * (1 + (RING_STRETCH - 1) * e),
             it.radius * g
           );
-        } else if (it.node.position.x !== it.avenuePos.x || it.node.scale.y !== it.height) {
+        } else {
           it.node.position.copy(it.avenuePos);
           it.node.quaternion.copy(it.avenueQuat);
-          it.node.scale.set(it.radius, it.height, it.radius);
+          // the colonnade does not fade in, it rises — staggered, §1 leading
+          const r = clamp((reveal.value - (it.index / items.length) * 0.45) / 0.55);
+          const e = r * r * (3 - 2 * r);
+          it.node.scale.set(it.radius, it.height * (0.04 + e * 0.96), it.radius);
+          it.node.position.y = it.avenuePos.y - it.height * (1 - e) * 0.5;
         }
       }
       for (const e of echoItems) {

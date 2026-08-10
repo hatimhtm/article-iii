@@ -71,6 +71,7 @@ export const state = {
   reducedMotion: prefersReducedMotion(),
   quality: 'high',    // high | medium | low
   overlay: null,      // 'map' | 'quiz' | 'search' | null
+  spread: false,      // the full-screen study spread is open
   webgl: true,
   audio: false,
   time: 0,

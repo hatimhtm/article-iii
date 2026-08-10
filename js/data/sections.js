@@ -12,6 +12,7 @@
  */
 
 import { CLUSTER_OF } from './clusters.js';
+import { MOTIF_OF } from './motifs.js';
 
 const RAW = [
   /* ─────────────────────────────────────────────────────────── I ─── */
@@ -735,6 +736,7 @@ export const SECTIONS = RAW.map((s, i) => ({
   index: i,
   roman: ROMAN[s.n],
   cluster: CLUSTER_OF[s.n],
+  motif: MOTIF_OF[s.n],
   /** flat searchable haystack */
   search: [
     `Section ${s.n}`, s.title, s.short, s.kicker,

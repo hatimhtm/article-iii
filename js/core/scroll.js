@@ -59,7 +59,14 @@ export function tickScroll(dt) {
 }
 
 export function goToProgress(p, smooth = true) {
-  const y = clamp(p) * scrollRange();
+  const target = clamp(p);
+  if (locked) {
+    // The study spread freezes the page but still needs to move the journey,
+    // so drive progress directly and reconcile the scrollbar on unlock.
+    state.rawProgress = target;
+    return;
+  }
+  const y = target * scrollRange();
   window.scrollTo({ top: y, behavior: smooth && !state.reducedMotion ? 'smooth' : 'auto' });
 }
 
@@ -94,8 +101,12 @@ export function step(dir) {
 }
 
 export function lockScroll(v) {
+  if (v === locked) return;
   locked = v;
-  // html keeps its scrollTop while overflow is hidden, so closing an overlay
-  // returns to exactly where the traveller was
   document.documentElement.classList.toggle('is-locked', v);
+  if (!v) {
+    // progress may have been driven programmatically while frozen — put the
+    // scrollbar back under it before live scroll events resume
+    window.scrollTo({ top: state.rawProgress * scrollRange(), behavior: 'auto' });
+  }
 }

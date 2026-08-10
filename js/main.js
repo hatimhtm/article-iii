@@ -31,6 +31,7 @@ const audio = createAudio();
 const overlays = createOverlays(el('#overlays'));
 
 const reader = createReader(stage, {
+  overlayRoot: el('#overlays'),
   onSectionChange(i) {
     audio.chime(i);
     const h = `#s${i + 1}`;
@@ -63,6 +64,13 @@ window.addEventListener('keydown', (e) => {
   if (tag === 'INPUT' || tag === 'TEXTAREA') return;
   if (overlays.isOpen()) return;
 
+  if (e.key === 'Escape' && reader.isSpreadOpen()) {
+    e.preventDefault(); reader.closeSpread(); return;
+  }
+  if (e.key === 'Enter' && state.phase === 'colonnade') {
+    e.preventDefault(); reader.toggleSpread(); return;
+  }
+
   switch (e.key) {
     case 'ArrowRight': case 'l': case 'L':
       e.preventDefault(); step(1); break;
@@ -77,6 +85,14 @@ window.addEventListener('keydown', (e) => {
     default:
       if (/^[1-9]$/.test(e.key)) { e.preventDefault(); goToSection(+e.key - 1); }
   }
+});
+
+// clicking a shaft is the most direct way to reach a section there is
+canvas.addEventListener('click', () => {
+  const i = world?.hovered?.() ?? -1;
+  if (i < 0) return;
+  if (i === state.sectionIndex) reader.openSpread();
+  else goToSection(i);
 });
 
 if (!state.isCoarse) {

@@ -38,12 +38,26 @@ export const camCurve = new THREE.CatmullRomCurve3(
 
 export const kToU = (k) => clamp((k - K_START) / (PTS - 1), 0, 1);
 
+/**
+ * Constant-speed travel past twenty-two identical intervals is the dullest
+ * motion there is. This bends the mapping so the camera decelerates into each
+ * section, holds, then accelerates through the gap — the journey gets a pulse
+ * instead of a drone. Continuous at the cell boundaries, so no seams.
+ */
+const DWELL = 0.74;   // 0 = linear, 1 = full stop at every section
+function dwellCurve(k) {
+  const i = Math.round(k);
+  const f = k - i;                        // -0.5 … 0.5 within the cell
+  const shaped = Math.sign(f) * 0.5 * Math.pow(Math.abs(f) * 2, 2.3);
+  return i + lerp(f, shaped, DWELL);
+}
+
 /** Scroll progress -> section coordinate k (continuous, incl. lead-in). */
 export function progressToK(p) {
   const { name, local } = phaseAt(p);
   if (name === 'hero') return lerp(K_START, K_START + 2.5, local);
   if (name === 'prologue') return lerp(K_START + 2.5, -0.5, local);
-  if (name === 'colonnade') return local * SECTION_COUNT - 0.5;
+  if (name === 'colonnade') return dwellCurve(local * SECTION_COUNT - 0.5);
   return SECTION_COUNT - 0.5; // epilogue drives the camera itself
 }
 

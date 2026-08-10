@@ -25,6 +25,24 @@ You travel a colonnade in deep space. Each of the twenty-two sections is a shaft
 
 The scene is not decoration. Its structure carries the article's structure.
 
+### `/// THE SEVEN SIGNATURES`
+
+A colonnade where §2 and §10 differ only in hue is wallpaper. Every shaft behaves differently, and the behaviour is an argument about what the section does:
+
+| | Signature | Sections |
+|---|---|---|
+| **Foundation** | two clauses breathing in step | §1 |
+| **Scan** | a light sweeping the shaft, looking through it | §2, §3, §7, §17 |
+| **Broadcast** | rings leaving the mark and travelling outward | §4, §5, §8 |
+| **Carve** | a wedge cut away, rotating | §6, §9, §10 |
+| **Cage** | vertical bars, the interior held dark | §12, §13, §15, §18 |
+| **Fracture** | cracks, lit from inside | §19, §20 |
+| **Balance** | two marks converging and separating, like scales | §11, §14, §16, §21, §22 |
+
+The dust field around each shaft takes its cue from the same table — pulled inward by the scrutiny sections, pushed outward by the ones about projection, falling still around the ones about confinement.
+
+The camera does not travel at a constant speed either. It decelerates into each section, holds, then accelerates through the gap, banking into the turns — a pulse instead of a drone.
+
 ### `/// SECTIONS`
 
 The twenty-two sections keep their constitutional order, grouped into nine movements as a reading aid:
@@ -41,7 +59,13 @@ The twenty-two sections keep their constitutional order, grouped into nine movem
 | Human Dignity | §18 – §20 | Political belief, servitude, cruel punishment, debt |
 | Finality & Fair Warning | §21 – §22 | Double jeopardy, ex post facto, bills of attainder |
 
-### `/// WHAT EACH SECTION CARRIES`
+### `/// TWO WAYS TO READ IT`
+
+**Travelling.** A card carrying the section's identity and the text of the law itself, set large with the subsection marks hanging in the margin the way a statute is set on paper. Nothing behind tabs.
+
+**Studying.** Press <kbd>Enter</kbd>, click the shaft, or hit *Read in full*, and the section opens into an editorial spread with every facet visible at once. It stays open as you move between sections, so the whole article can be read straight through without collapsing once.
+
+Each section carries:
 
 - **The text, verbatim** — cross-checked against three independent transcriptions
 - **In plain words** — what it actually does, in ordinary English
@@ -51,13 +75,16 @@ The twenty-two sections keep their constitutional order, grouped into nine movem
 - **In real life** — a concrete Philippine scenario the section decides
 - **The limits** — where the right stops, which is where most exam questions live
 
+Read state is kept in `localStorage`, so it remembers where she got to across weeks. The spread can copy the section text with its citation attached.
+
 ### `/// ALSO IN HERE`
 
-- A **prologue**: 1972 to 1987, because §12 does not make sense without it
+- A **prologue**: 1972 to 1987, because §12 does not make sense without it. The martial-law beats are felt rather than described — the world desaturates to iron, ash falls through the frame, the survey grid tightens into a cage, and the camera loses its steadiness. On 21 August 1983 there is a flash.
 - A **map** of all twenty-two sections, with full-text search across every doctrine and case note
 - A **recall test**: fifteen scenarios, name the section each one turns on
 - Deep links — `#s12` opens Section 12 directly
-- Keyboard navigation: `←` `→` step, `1`–`9` jump, `M` map, `T` test
+- Keyboard navigation: `←` `→` step, `1`–`9` jump, `Enter` open in full, `Esc` close, `M` map, `T` test
+- Shafts are pickable — hover one to light it, click it to go there
 - A reduce-motion toggle, honoured alongside `prefers-reduced-motion`
 - Optional ambient sound, synthesised at runtime — no audio files
 
@@ -91,10 +118,12 @@ js/
   main.js             bootstrap, input, resize, the frame loop
   core/
     state.js          journey layout in screen-heights, phase maths, quality tiers
+    read.js           what has already been read, persisted
     scroll.js         virtual scroll, smoothing, jumps
     util.js           easing, damping, small DOM helpers
   data/
     sections.js       the 22 sections — verbatim text and all commentary
+    motifs.js         which signature each section wears, and its dust field
     clusters.js       the nine movements and their palettes
     prologue.js       1972–1987
     quiz.js           15 recall scenarios
@@ -108,7 +137,7 @@ js/
     post.js           bloom + final grade
     glsl.js           shared noise and haze
   ui/
-    reader.js         hero, prologue, the section panel, the epilogue
+    reader.js         hero, prologue, the travelling card, the study spread, the epilogue
     hud.js            wordmark, rail, position, tools
     overlays.js       map + recall test
     audio.js          synthesised ambience

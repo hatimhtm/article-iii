@@ -16,6 +16,8 @@ export function createGround(hazeColor) {
     uHaze: { value: hazeColor },
     uSun: { value: SUN_POS.clone() },
     uWake: { value: 0 },
+    uRing: { value: 1 },        // 0..1, an arrival ring expanding from uFocus
+    uDread: { value: 0 },
   };
 
   const mesh = new THREE.Mesh(
@@ -36,7 +38,7 @@ export function createGround(hazeColor) {
       `,
       fragmentShader: /* glsl */ `
         ${NOISE}
-        uniform float uTime, uWake;
+        uniform float uTime, uWake, uRing, uDread;
         uniform vec3 uCam, uFocus, uAccent, uHaze, uSun;
         varying vec3 vW;
 
@@ -57,7 +59,12 @@ export function createGround(hazeColor) {
           // single octave — this covers the whole lower half of the frame
           float swell = noise3(vec3(vW.xz * 0.004, uTime * 0.03)) * 0.5;
 
-          float pool = exp(-length(vW.xz - uFocus.xz) / 22.0) * 0.8;
+          float dFocus = length(vW.xz - uFocus.xz);
+          float pool = exp(-dFocus / 22.0) * 0.8;
+
+          // the shaft's arrival throws a ring out across the floor
+          float rr = uRing * 210.0;
+          float ring = exp(-pow((dFocus - rr) * 0.10, 2.0)) * (1.0 - uRing) * 1.6;
           float sunPool = exp(-length(vW.xz - uSun.xz) / 260.0) * 0.35;
 
           // the survey grid stays a neutral warm grey; the section colour
@@ -68,7 +75,17 @@ export function createGround(hazeColor) {
           c += mix(grid, uAccent, 0.7) * pool * (0.22 + uWake * 0.6);
           c += vec3(0.95, 0.80, 0.52) * sunPool * 0.7;
 
-          float a = (g1 + g2 + pool * 0.5 + sunPool * 0.45 + swell * 0.08) * reach;
+          c += mix(grid, uAccent, 0.85) * ring * 0.9;
+
+          // under martial law the survey grid tightens into something else
+          if (uDread > 0.01) {
+            float bars = gridLine(vW.xz, 6.0, 1.3) * uDread * 0.85;
+            c += vec3(0.70, 0.22, 0.19) * bars;
+            c *= mix(1.0, 0.55, uDread);
+          }
+
+          float a = (g1 + g2 + pool * 0.5 + sunPool * 0.45 + swell * 0.08 + ring * 0.6
+                     + gridLine(vW.xz, 6.0, 1.3) * uDread * 0.5) * reach;
           if (a < 0.003) discard;
           gl_FragColor = vec4(c * 0.95, clamp(a, 0.0, 1.0));
         }
