@@ -26,8 +26,8 @@ export const camCurve = new THREE.CatmullRomCurve3(
   Array.from({ length: PTS }, (_, idx) => {
     const k = K_START + idx;
     return new THREE.Vector3(
-      Math.sin(k * 0.33) * 10,
-      2.2 + Math.sin(k * 0.77) * 1.5,
+      Math.sin(k * 0.22) * 6.5,
+      2.2 + Math.sin(k * 0.55) * 0.9,
       -k * SPACING
     );
   }),
@@ -44,7 +44,7 @@ export const kToU = (k) => clamp((k - K_START) / (PTS - 1), 0, 1);
  * section, holds, then accelerates through the gap — the journey gets a pulse
  * instead of a drone. Continuous at the cell boundaries, so no seams.
  */
-const DWELL = 0.74;   // 0 = linear, 1 = full stop at every section
+const DWELL = 0.66;   // 0 = linear, 1 = full stop at every section
 function dwellCurve(k) {
   const i = Math.round(k);
   const f = k - i;                        // -0.5 … 0.5 within the cell

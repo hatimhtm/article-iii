@@ -1,4 +1,4 @@
-import { state, detectQuality } from './core/state.js';
+import { state, detectQuality, progressForSection } from './core/state.js';
 import { initScroll, tickScroll, goToSection, goToProgress, step } from './core/scroll.js';
 import { damp, clamp, el } from './core/util.js';
 import { SECTION_COUNT } from './data/sections.js';
@@ -6,6 +6,12 @@ import { createReader } from './ui/reader.js';
 import { createHud } from './ui/hud.js';
 import { createOverlays } from './ui/overlays.js';
 import { createAudio } from './ui/audio.js';
+
+const MDBG = /[?&]mdbg/.test(location.search);
+if (MDBG) {
+  window.__motion = [];
+  window.__dbg = { state, progressForSection };
+}
 
 const stage = el('#stage');
 const canvas = el('#gl');
@@ -150,6 +156,14 @@ function frame(now) {
   reader.update();
   hud.update();
   world?.update(dt);
+
+  if (MDBG && window.__motion.length < 30000) {
+    const c = world?.camera;
+    window.__motion.push([
+      now, state.rawProgress, state.progress,
+      c ? c.position.z : 0, c ? c.fov : 0,
+    ]);
+  }
 }
 requestAnimationFrame(frame);
 

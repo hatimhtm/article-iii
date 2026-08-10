@@ -11,6 +11,7 @@ import { createSun } from './sun.js';
 import { createMonoliths } from './monoliths.js';
 import { createStarfield, createDust } from './particles.js';
 import { createGround } from './ground.js';
+import { createAurora, createComets } from './sky.js';
 import { createComposer } from './post.js';
 
 const HAZE_COLOR = new THREE.Color('#070C1B');
@@ -40,11 +41,16 @@ export function createWorld(canvas) {
   const stars = createStarfield(counts.stars);
   const dust = createDust(counts.dust, HAZE_COLOR);
   const ground = createGround(HAZE_COLOR);
+  const aurora = counts.sky ? createAurora() : null;
+  const comets = counts.sky ? createComets() : null;
 
   scene.add(sun.group, monoliths.group, stars.points, dust.points, ground.mesh);
+  if (aurora) scene.add(aurora.mesh);
+  if (comets) scene.add(comets.mesh);
 
   const post = createComposer(renderer, scene, camera, {
     bloom: counts.bloom,
+    rayTaps: counts.rayTaps,
     width: 1280,
     height: 720,
   });
@@ -69,6 +75,9 @@ export function createWorld(canvas) {
   let lastActive = -1;
   let firedFlash = false;
   let field = { pull: 0.3, turb: 1, rise: 1 };
+  const focusAim = new THREE.Vector3();
+  const _dolly = new THREE.Vector3();
+  const _sunNdc = new THREE.Vector3();
   const raycaster = new THREE.Raycaster();
   const ndc = new THREE.Vector2();
   let hovered = -1;
@@ -132,6 +141,30 @@ export function createWorld(canvas) {
         camAim.addScaledVector(f0.right, shift);
         camAim.y -= 7 * framing;   // lifts the shaft clear of the bottom sheet
       }
+
+      /* composed shot while dwelling: the eye lands on the lit band, the
+         camera dollies in a touch, the lens tightens, and a slow drift keeps
+         the parked frame alive. Leaving, everything releases to the road. */
+      if (name === 'colonnade') {
+        const nearest = clamp(Math.round(coord), 0, N - 1);
+        const u = Math.abs(coord - nearest);
+        const dwell = (1 - band(u, 0.16, 0.46)) * (1 - assembly);
+        if (dwell > 0.001) {
+          const it = monoliths.items[nearest];
+          focusAim.copy(it.node.position);
+          focusAim.y = it.avenuePos.y + (it.uniforms.uMark.value - 0.5) * it.height;
+          // hold the shaft off dead-centre; the reading card owns the right
+          focusAim.addScaledVector(f0.right, 5.5 * (1 - framing));
+          camAim.lerp(focusAim, 0.62 * dwell);
+          _dolly.copy(focusAim).sub(camPos).normalize();
+          camPos.addScaledVector(_dolly, 2.1 * dwell);
+          targetFov -= 2.4 * dwell;
+          if (!state.reducedMotion) {
+            camPos.addScaledVector(f0.right, Math.sin(t * 0.20) * 0.5 * dwell);
+            camPos.y += Math.sin(t * 0.155 + 1.3) * 0.28 * dwell;
+          }
+        }
+      }
     }
 
     // pointer parallax — small, so it reads as presence not wobble
@@ -148,10 +181,13 @@ export function createWorld(canvas) {
       camPos.y += py * 3;
     }
 
-    // bank into the turn, and let the lens breathe with speed — the two cues
-    // that separate "a camera on a rail" from "travelling"
-    const lateral = (camAim.x - camPos.x) * 0.06 + state.velocity * 26;
-    roll = damp(roll, state.reducedMotion ? 0 : clamp(lateral, -1, 1) * 0.055, 0.002, dt);
+    // bank from actual path curvature, scaled by speed — the rail's own
+    // geometry decides the lean, so it can never wobble against the turn
+    const curve = (f1.fwd ? f1.fwd.x - f0.fwd.x : 0);
+    const rollT = state.reducedMotion || name === 'epilogue'
+      ? 0
+      : clamp(curve * (2.2 + Math.min(Math.abs(state.velocity) * 30, 1.6)), -0.045, 0.045);
+    roll = damp(roll, rollT, 0.002, dt);
     camera.up.set(Math.sin(roll), Math.cos(roll), 0);
     camera.position.copy(camPos);
     camera.lookAt(camAim);
@@ -274,6 +310,21 @@ export function createWorld(canvas) {
     ground.uniforms.uRing.value = ringT;
     ground.uniforms.uDread.value = dread;
 
+    /* sky ---------------------------------------------------------- */
+    if (aurora) {
+      aurora.uniforms.uTime.value = t;
+      aurora.uniforms.uDread.value = dread;
+      aurora.uniforms.uWarm.value = warmth;
+      // quiet on the hero, breathing through the colonnade, glorious at the end
+      aurora.uniforms.uIntensity.value =
+        lerp(0.5, 1.0, wake) + assembly * 0.5 - dread * 0.15;
+    }
+    if (comets) {
+      comets.uniforms.uTime.value = t;
+      // no comets while history is being told
+      comets.uniforms.uIntensity.value = (1 - dread) * lerp(0.5, 1, wake);
+    }
+
     /* grade -------------------------------------------------------- */
     const g = post.grade.uniforms;
     g.uTime.value = t;
@@ -287,6 +338,21 @@ export function createWorld(canvas) {
     g.uFlash.value = flash * flash;
     g.uShake.value = state.reducedMotion ? 0 : dread * 0.8;
     g.uVignette.value += dread * 0.55;
+
+    /* volumetric rays — project the sun and fade as it leaves frame */
+    if (g.uRay) {
+      _sunNdc.copy(SUN_POS).project(camera);
+      const off = Math.max(Math.abs(_sunNdc.x), Math.abs(_sunNdc.y));
+      const inFront = _sunNdc.z < 1;
+      const vis = inFront ? clamp(1 - Math.max(0, (off - 1.05) / 0.7)) : 0;
+      g.uSunScreen.value.set(_sunNdc.x * 0.5 + 0.5, _sunNdc.y * 0.5 + 0.5);
+      g.uRay.value = vis * sunLevel * (0.16 + wake * 0.14 + assembly * 0.30);
+      g.uRayTint.value.setRGB(1.0, lerp(0.62, 0.87, warmth), lerp(0.35, 0.60, warmth));
+      if (dread > 0.01) {
+        g.uRayTint.value.lerp(_cA.setRGB(0.85, 0.28, 0.20), dread);
+        g.uRay.value *= 1 - dread * 0.5;
+      }
+    }
 
     if (post.bloom) {
       post.bloom.strength = lerp(0.34, 0.56, wake) + assembly * 0.18;

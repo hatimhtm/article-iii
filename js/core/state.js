@@ -92,7 +92,7 @@ export function detectQuality() {
 }
 
 export const COUNTS = {
-  high: { stars: 4200, dust: 8000, bloom: true },
-  medium: { stars: 2200, dust: 3600, bloom: true },
-  low: { stars: 1100, dust: 1500, bloom: false },
+  high: { stars: 4200, dust: 8000, bloom: true, rayTaps: 36, sky: true },
+  medium: { stars: 2200, dust: 3600, bloom: true, rayTaps: 20, sky: true },
+  low: { stars: 1100, dust: 1500, bloom: false, rayTaps: 0, sky: false },
 };

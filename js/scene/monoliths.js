@@ -50,6 +50,9 @@ const BODY_FS = /* glsl */ `
   uniform float uMark;
   uniform float uSeed;
   uniform float uReveal;
+#ifdef MIRROR
+  uniform float uMirrorFade;
+#endif
   uniform float uMotif;
   uniform float uIgnite;
   uniform float uHover;
@@ -166,6 +169,12 @@ const BODY_FS = /* glsl */ `
 
     // a shaft you have drawn level with dissolves rather than becoming a wall
     a *= smoothstep(14.0, 40.0, vDist);
+
+#ifdef MIRROR
+    // the black-glass floor: dimmer, cooler, dying with depth
+    a *= uMirrorFade * 0.34 * (1.0 - vH * 0.55);
+    c *= 0.82;
+#endif
 
     if (a < 0.004) discard;
     gl_FragColor = vec4(c, clamp(a, 0.0, 1.0));
@@ -340,6 +349,37 @@ export function createMonoliths(hazeColor) {
     echoItems.push({ mesh: m, uniforms, index: i });
   });
 
+  /* ── the floor is black glass: a mirrored twin of every shaft, sharing the
+        source materials' uniform objects so motifs, ignition waves and the
+        epilogue fold all reflect without any extra bookkeeping ─────────── */
+  const FLOOR_Y = -30;
+  const mirrorFade = { value: 1 };
+  const mirror = new THREE.Group();
+  mirror.position.y = FLOOR_Y * 2;
+  mirror.scale.y = -1;
+  group.add(mirror);
+
+  const mirrorPairs = [];
+  const addMirror = (srcMesh, srcNode) => {
+    const m = new THREE.Mesh(
+      srcMesh.geometry,
+      new THREE.ShaderMaterial({
+        // same uniforms object by reference — this is the whole trick
+        uniforms: { ...srcMesh.material.uniforms, uMirrorFade: mirrorFade },
+        vertexShader: BODY_VS,
+        fragmentShader: BODY_FS,
+        transparent: true,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+        defines: { MIRROR: 1 },
+      })
+    );
+    mirror.add(m);
+    mirrorPairs.push([srcNode, m]);
+  };
+  for (const it of items) addMirror(it.body, it.node);
+  for (const e of echoItems) addMirror(e.mesh, e.mesh);
+
   const _p = new THREE.Vector3();
   const _q = new THREE.Quaternion();
   let lastActive = -1;
@@ -415,6 +455,17 @@ export function createMonoliths(hazeColor) {
         e.uniforms.uCharge.value =
           Math.max(clamp(1 - d / 2.6) * 0.5, wake * 0.12) * (1 - assembly);
         e.uniforms.uTime.value = t;
+      }
+
+      // reflections die as the colonnade leaves the floor for the ring
+      mirrorFade.value = 1 - assembly;
+      mirror.visible = mirrorFade.value > 0.01;
+      if (mirror.visible) {
+        for (const [src, m] of mirrorPairs) {
+          m.position.copy(src.position);
+          m.quaternion.copy(src.quaternion);
+          m.scale.copy(src.scale);
+        }
       }
     },
   };

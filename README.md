@@ -41,7 +41,9 @@ A colonnade where §2 and §10 differ only in hue is wallpaper. Every shaft beha
 
 The dust field around each shaft takes its cue from the same table — pulled inward by the scrutiny sections, pushed outward by the ones about projection, falling still around the ones about confinement.
 
-The camera does not travel at a constant speed either. It decelerates into each section, holds, then accelerates through the gap, banking into the turns — a pulse instead of a drone.
+The camera does not travel at a constant speed either. It decelerates into each section, holds, then accelerates through the gap, banking with the actual curvature of the rail. A critically-damped spring drives all motion — it tracks tightly and lands without a single oscillation — and when you stop scrolling near a section, the camera glides magnetically onto its exact centre, so you can never park in the dead zone between two shafts. While dwelling, the shot composes itself: the eye settles on the lit band, the camera dollies in, the lens tightens, and a slow drift keeps the frame alive.
+
+The world itself: **volumetric god rays** march the frame toward the sun, so light streams past every shaft and pours through the assembled ring at the end. The floor is **black glass** — a live mirror of every shaft, motif, ignition wave and fold. An **aurora** breathes over the horizon, collapsing to an ember line under martial law, and a handful of comets cross the sky on long, quiet cycles.
 
 ### `/// SECTIONS`
 

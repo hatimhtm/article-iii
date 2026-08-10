@@ -18,6 +18,9 @@ const GradeShader = {
     uFlash: { value: 0.0 },    // impulse — the tarmac, 21 August 1983
     uDread: { value: 0.0 },    // desaturate and push toward iron and blood
     uShake: { value: 0.0 },
+    uSunScreen: { value: null },   // sun in 0..1 screen space
+    uRay: { value: 0.0 },          // volumetric ray strength
+    uRayTint: { value: null },
   },
   vertexShader: /* glsl */ `
     varying vec2 vUv;
@@ -29,6 +32,9 @@ const GradeShader = {
   fragmentShader: /* glsl */ `
     uniform sampler2D tDiffuse;
     uniform float uTime, uAberration, uVignette, uGrain, uFade, uWarm, uFlash, uDread, uShake;
+    uniform vec2 uSunScreen;
+    uniform float uRay;
+    uniform vec3 uRayTint;
     varying vec2 vUv;
 
     float hash(vec2 p) {
@@ -55,6 +61,23 @@ const GradeShader = {
       // warm the highlights very slightly — gold, not orange
       col = mix(col, col * vec3(1.05, 1.0, 0.93), uWarm);
 
+      // ── volumetric light: march the bloomed frame toward the sun. Bright
+      // pixels smear into crepuscular rays; dark shafts carve shadows in them.
+#if RAY_TAPS > 0
+      if (uRay > 0.001) {
+        vec2 delta = (uSunScreen - vUv) * (0.85 / float(RAY_TAPS));
+        vec2 p = vUv;
+        float illum = 1.0;
+        vec3 acc = vec3(0.0);
+        for (int i = 0; i < RAY_TAPS; i++) {
+          p += delta;
+          acc += texture2D(tDiffuse, p).rgb * illum;
+          illum *= 0.955;
+        }
+        col += (acc / float(RAY_TAPS)) * uRayTint * uRay;
+      }
+#endif
+
       if (uDread > 0.001) {
         float lum = dot(col, vec3(0.2126, 0.7152, 0.0722));
         vec3 iron = mix(vec3(lum), col, 0.42) * vec3(1.14, 0.86, 0.80);
@@ -77,6 +100,8 @@ const GradeShader = {
 };
 
 export function createComposer(renderer, scene, camera, opts) {
+  GradeShader.uniforms.uSunScreen.value = new THREE.Vector2(0.5, 0.4);
+  GradeShader.uniforms.uRayTint.value = new THREE.Color('#FFDD99');
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
 
@@ -94,6 +119,8 @@ export function createComposer(renderer, scene, camera, opts) {
   composer.addPass(new OutputPass());
 
   const grade = new ShaderPass(GradeShader);
+  grade.material.defines.RAY_TAPS = opts.rayTaps ?? 0;
+  grade.material.needsUpdate = true;
   composer.addPass(grade);
 
   return {
