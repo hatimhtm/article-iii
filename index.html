@@ -4,59 +4,40 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Article III — The Bill of Rights of the Philippines</title>
-<meta name="description" content="An interactive, three-dimensional reading of Article III of the 1987 Constitution of the Republic of the Philippines: all twenty-two sections, verbatim, with the doctrines, landmark cases and history behind each one.">
-<meta name="theme-color" content="#04060F">
-<meta name="color-scheme" content="dark">
+<meta name="description" content="A scholarly reading of Article III of the 1987 Constitution of the Republic of the Philippines: all twenty-two sections, verbatim, with the doctrines, landmark cases and history behind each one.">
+<meta name="theme-color" content="#F5F0E4">
+<meta name="color-scheme" content="light">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="Article III — The Bill of Rights">
-<meta property="og:description" content="Twenty-two sections of the 1987 Philippine Constitution, walked one at a time: verbatim text, doctrines, landmark cases, and the martial-law history that produced them.">
-<meta name="twitter:card" content="summary_large_image">
+<meta property="og:description" content="Twenty-two sections of the 1987 Philippine Constitution, read in full: verbatim text, doctrines, landmark cases, and the martial-law history that produced them.">
 
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2304060F'/%3E%3Cg fill='none' stroke='%23F0C35C' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M32 12v40M20 18v28M44 18v28'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23F5F0E4'/%3E%3Cg fill='none' stroke='%23785A28' stroke-width='3.4' stroke-linecap='round'%3E%3Cpath d='M32 12v40M20 16v32M44 16v32'/%3E%3C/g%3E%3C/svg%3E">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..700&family=Newsreader:ital,opsz,wght@0,6..72,200..600;1,6..72,200..500&family=Inter:wght@300..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Newsreader:ital,opsz,wght@0,6..72,200..700;1,6..72,200..600&family=Inter:wght@300..700&display=swap">
 <link rel="stylesheet" href="./css/main.css">
-
-<script type="importmap">
-{
-  "imports": {
-    "three": "./vendor/three.module.js",
-    "three/addons/": "./vendor/addons/"
-  }
-}
-</script>
 </head>
 
 <body>
+<a class="skip" href="#s1">Skip to Section 1</a>
 
-<!-- the scroll surface: nothing is drawn here, it only supplies height -->
-<div id="spacer" aria-hidden="true"></div>
+<header id="masthead" class="masthead"></header>
+<aside id="toc" class="toc" aria-label="Index of the article"></aside>
+<div class="toc-scrim" data-act="toc" aria-hidden="true"></div>
 
-<canvas id="gl" aria-hidden="true"></canvas>
+<main id="doc" class="doc"></main>
+
+<div id="overlays"></div>
 
 <noscript>
   <div class="noscript">
     <h1>Article III — The Bill of Rights</h1>
-    <p>This reading of the 1987 Philippine Constitution needs JavaScript enabled.
-       The full text of Article III is available at
-       <a href="https://www.officialgazette.gov.ph/constitutions/1987-constitution/">the Official Gazette</a>.</p>
+    <p>This reading needs JavaScript enabled. The full text of Article III is available at
+       <a href="https://lawphil.net/consti/cons1987.html">The LawPhil Project</a>.</p>
   </div>
 </noscript>
-
-<main id="stage"></main>
-<div id="hud"></div>
-<div id="overlays"></div>
-
-<div id="boot">
-  <div class="boot__inner">
-    <span class="boot__num">III</span>
-    <span class="boot__txt">Article Three</span>
-    <span class="boot__rule"><i></i></span>
-  </div>
-</div>
 
 <script type="module" src="./js/main.js"></script>
 </body>

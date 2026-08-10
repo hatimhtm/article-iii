@@ -1,9 +1,12 @@
 import { SECTIONS } from '../data/sections.js';
 import { CLUSTERS, CLUSTER_ORDER } from '../data/clusters.js';
 import { QUIZ } from '../data/quiz.js';
-import { state } from '../core/state.js';
-import { goToSection, lockScroll } from '../core/scroll.js';
-import { make, clamp } from '../core/util.js';
+import { make } from '../core/util.js';
+
+const goToSection = (i) => document.querySelector(`#s${i + 1}`)?.scrollIntoView({
+  behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+});
+const lockScroll = (v) => document.documentElement.classList.toggle('is-locked', v);
 
 /* ══ shared shell ════════════════════════════════════════════════════ */
 function shell(id, title, sub, bodyHtml) {
@@ -50,7 +53,7 @@ export function createMap(root, onClose) {
     </section>`;
   }).join('');
 
-  const node = shell('map', 'The whole article', 'Twenty-two sections in nine movements. Choose one, or filter by any word in the text.', `
+  const node = shell('map', 'Index of the article', 'Twenty-two sections in nine movements. Choose one, or search any word in the text, the doctrines, or the cases.', `
     <div class="map__filter">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>
       <input type="search" placeholder="Search the text, doctrines and cases…" aria-label="Filter sections">
@@ -90,10 +93,7 @@ export function createMap(root, onClose) {
 
   return {
     node,
-    onOpen() {
-      cards.forEach((c) => c.classList.toggle('is-current', +c.dataset.go === state.sectionIndex));
-      setTimeout(() => input.focus(), 260);
-    },
+    onOpen() { setTimeout(() => input.focus(), 260); },
     reset() { input.value = ''; applyFilter(); },
   };
 }
@@ -193,7 +193,7 @@ export function createQuiz(root, onClose) {
       pct >= 90 ? 'You know this article.' :
       pct >= 70 ? 'Solid. The gaps are worth a second pass.' :
       pct >= 45 ? 'The shape is there. Re-read the movements you missed.' :
-      'Worth walking the colonnade again, slowly.';
+      'Worth reading the article again, slowly.';
     stage.innerHTML = `
       <div class="quiz__done">
         <p class="quiz__bignum">${score}<span>/ ${QUIZ.length}</span></p>
@@ -221,7 +221,6 @@ export function createOverlays(root) {
     if (!current) return;
     current.node.classList.remove('is-open');
     current = null;
-    state.overlay = null;
     lockScroll(false);
     lastFocus?.focus?.();
   };
@@ -236,7 +235,6 @@ export function createOverlays(root) {
     if (!o) return;
     lastFocus = document.activeElement;
     current = o;
-    state.overlay = id;
     lockScroll(true);
     o.node.classList.add('is-open');
     o.onOpen?.();

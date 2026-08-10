@@ -1,17 +1,16 @@
 <div align="center">
 
-<img src="assets-readme/hero-banner.svg" alt="Article III — The Bill of Rights of the Philippines" width="100%">
+# Article III — The Bill of Rights
 
-<br>
+*A scholarly reading of Article III of the 1987 Constitution of the Republic of the
+Philippines: all twenty-two sections, verbatim, with the doctrines, landmark cases
+and history behind each one.*
 
-[![Live](https://img.shields.io/badge/live-hatimhtm.github.io%2Farticle--iii-F0C35C?style=flat-square&labelColor=1A1A1A)](https://hatimhtm.github.io/article-iii/)
-[![Stack](https://img.shields.io/badge/stack-vanilla%20JS%20%2B%20WebGL2-F0C35C?style=flat-square&labelColor=1A1A1A)](#-stack)
-[![Build](https://img.shields.io/badge/build-none-F0C35C?style=flat-square&labelColor=1A1A1A)](#-local)
-[![License](https://img.shields.io/badge/license-MIT-F0C35C?style=flat-square&labelColor=1A1A1A)](LICENSE)
+**[→ Open the reading](https://hatimhtm.github.io/article-iii/)**
 
-*An interactive, motion-driven reading of Article III of the 1987 Constitution of the Republic of the Philippines — all twenty-two sections, verbatim, with the doctrines, landmark cases and martial-law history that produced each one.*
-
-**[→ Open the experience](https://hatimhtm.github.io/article-iii/)**
+[![Live](https://img.shields.io/badge/live-hatimhtm.github.io%2Farticle--iii-8C6A28?style=flat-square&labelColor=23201B)](https://hatimhtm.github.io/article-iii/)
+[![Stack](https://img.shields.io/badge/stack-vanilla%20JS%2C%20no%20build-8C6A28?style=flat-square&labelColor=23201B)](#-stack)
+[![License](https://img.shields.io/badge/license-MIT-8C6A28?style=flat-square&labelColor=23201B)](LICENSE)
 
 </div>
 
@@ -19,147 +18,76 @@
 
 ### `/// BRIEF`
 
-Article III is usually met as a wall of text. This is the same article, walked.
+A statute book, set on paper. The design language comes from the physical world of
+Philippine law — the ivory of the gazette page, narra from the bench, matte brass,
+banker's-lamp green, the oxblood of a law-book spine — grounded in the neoclassical
+Supreme Court building on Padre Faura and the courtroom's own grammar: the elevated
+bench, the seal, the bar rail, and behind the whole story, the cell.
 
-You travel a colonnade in deep space. Each of the twenty-two sections is a shaft of stone and light; the height of the lit band on each shaft tells you where that section sits in the article, so the whole thing reads as a rising scale as you move through it. At the far end, an eight-rayed sun. When you reach it, the colonnade folds inward and the twenty-two shafts become its rays.
+The history of 1972–1987 is told from inside that cell: a dark band of the page where
+light falls through bars, before the document emerges onto paper at ratification.
 
-The scene is not decoration. Its structure carries the article's structure.
+### `/// THE DOCUMENT`
 
-### `/// THE SEVEN SIGNATURES`
+- **A title page** with an engraved eight-rayed sun and the three stars
+- **The cell** — seven beats from Proclamation No. 1081 to ratification
+- **Nine chapters** of law, each opened by an engraved chapter plate:
+  the scales, the threshold, the open book, the compass rose, the boundary stone,
+  the courthouse door, the bench, the broken chain, the sealed book
+- **Twenty-two sections**, each carrying: the verbatim text set as a statute block
+  with hanging subsection marks · a plain-English reading · the drafting history ·
+  numbered doctrines · landmark cases with year badges · a concrete scenario ·
+  the limits of the right
+- **A closing** — what the whole article teaches, sources, and the dedication
 
-A colonnade where §2 and §10 differ only in hue is wallpaper. Every shaft behaves differently, and the behaviour is an argument about what the section does:
+### `/// STUDY FEATURES`
 
-| | Signature | Sections |
-|---|---|---|
-| **Foundation** | two clauses breathing in step | §1 |
-| **Scan** | a light sweeping the shaft, looking through it | §2, §3, §7, §17 |
-| **Broadcast** | rings leaving the mark and travelling outward | §4, §5, §8 |
-| **Carve** | a wedge cut away, rotating | §6, §9, §10 |
-| **Cage** | vertical bars, the interior held dark | §12, §13, §15, §18 |
-| **Fracture** | cracks, lit from inside | §19, §20 |
-| **Balance** | two marks converging and separating, like scales | §11, §14, §16, §21, §22 |
-
-The dust field around each shaft takes its cue from the same table — pulled inward by the scrutiny sections, pushed outward by the ones about projection, falling still around the ones about confinement.
-
-The camera does not travel at a constant speed either. It decelerates into each section, holds, then accelerates through the gap, banking with the actual curvature of the rail. A critically-damped spring drives all motion — it tracks tightly and lands without a single oscillation — and when you stop scrolling near a section, the camera glides magnetically onto its exact centre, so you can never park in the dead zone between two shafts. While dwelling, the shot composes itself: the eye settles on the lit band, the camera dollies in, the lens tightens, and a slow drift keeps the frame alive.
-
-The world itself: **volumetric god rays** march the frame toward the sun, so light streams past every shaft and pours through the assembled ring at the end. The floor is **black glass** — a live mirror of every shaft, motif, ignition wave and fold. An **aurora** breathes over the horizon, collapsing to an ember line under martial law, and a handful of comets cross the sky on long, quiet cycles.
-
-### `/// SECTIONS`
-
-The twenty-two sections keep their constitutional order, grouped into nine movements as a reading aid:
-
-| Movement | Sections | |
-|---|---|---|
-| The Foundation | §1 | Due process, equal protection |
-| Security of the Person | §2 – §3 | Searches, seizures, privacy, the exclusionary rule |
-| Voice & Conscience | §4 – §5 | Speech, press, assembly, petition, religion |
-| Movement, Knowledge, Association | §6 – §8 | Abode, travel, information, unions |
-| Property & Obligation | §9 – §10 | Just compensation, non-impairment |
-| Access to Justice | §11 | Free access to the courts |
-| The Rights of the Accused | §12 – §17 | Custodial rights, bail, fair trial, habeas corpus, speedy disposition, self-incrimination |
-| Human Dignity | §18 – §20 | Political belief, servitude, cruel punishment, debt |
-| Finality & Fair Warning | §21 – §22 | Double jeopardy, ex post facto, bills of attainder |
-
-### `/// TWO WAYS TO READ IT`
-
-**Travelling.** A card carrying the section's identity and the text of the law itself, set large with the subsection marks hanging in the margin the way a statute is set on paper. Nothing behind tabs.
-
-**Studying.** Press <kbd>Enter</kbd>, click the shaft, or hit *Read in full*, and the section opens into an editorial spread with every facet visible at once. It stays open as you move between sections, so the whole article can be read straight through without collapsing once.
-
-Each section carries:
-
-- **The text, verbatim** — cross-checked against three independent transcriptions
-- **In plain words** — what it actually does, in ordinary English
-- **Why it exists** — the drafting history, and what the 1986 Commission was answering
-- **Doctrines** — the named tests and rules a student is expected to know
-- **Landmark cases** — two to five per section, with the holding in one line
-- **In real life** — a concrete Philippine scenario the section decides
-- **The limits** — where the right stops, which is where most exam questions live
-
-Read state is kept in `localStorage`, so it remembers where she got to across weeks. The spread can copy the section text with its citation attached.
-
-### `/// ALSO IN HERE`
-
-- A **prologue**: 1972 to 1987, because §12 does not make sense without it. The martial-law beats are felt rather than described — the world desaturates to iron, ash falls through the frame, the survey grid tightens into a cage, and the camera loses its steadiness. On 21 August 1983 there is a flash.
-- A **map** of all twenty-two sections, with full-text search across every doctrine and case note
+- A sticky **case index** with per-section read marks and a progress bar
+- **Mark as read**, persisted in `localStorage`; dwelling on a section long enough
+  marks it read automatically
+- A searchable **index overlay** across the text, doctrines and cases
 - A **recall test**: fifteen scenarios, name the section each one turns on
-- Deep links — `#s12` opens Section 12 directly
-- Keyboard navigation: `←` `→` step, `1`–`9` jump, `Enter` open in full, `Esc` close, `M` map, `T` test
-- Shafts are pickable — hover one to light it, click it to go there
-- A reduce-motion toggle, honoured alongside `prefers-reduced-motion`
-- Optional ambient sound, synthesised at runtime — no audio files
+- Deep links (`#s12`), keyboard navigation (`j`/`k`, `1`–`9`, `I`, `T`), print styles
+- Reduced-motion respected throughout; the only animation is paper settling
 
 ### `/// SOURCES`
 
-The constitutional text was taken from three sources and reconciled character by character:
-
-- [ChanRobles Virtual Law Library](https://chanrobles.com/article3.htm)
-- [The LawPhil Project](https://lawphil.net/consti/cons1987.html)
-- [University of Minnesota Human Rights Library](https://hrlibrary.umn.edu/research/Philippines/PHILIPPINE%20CONSTITUTION.pdf)
-
-Where the three agree on wording that reads oddly — §12(4)'s *"compensation to the rehabilitation of victims"* — the ratified text is reproduced as it stands, with a note in the panel.
-
-Commentary, doctrine summaries and case notes are study aids. They are not legal advice, and they are no substitute for reading the reports.
+The constitutional text was reconciled across three transcriptions:
+[ChanRobles Virtual Law Library](https://chanrobles.com/article3.htm),
+[The LawPhil Project](https://lawphil.net/consti/cons1987.html), and the
+[University of Minnesota Human Rights Library](https://hrlibrary.umn.edu/research/Philippines/PHILIPPINE%20CONSTITUTION.pdf).
+Where the ratified wording reads oddly — §12(4) — it is reproduced as it stands,
+with a textual note. Commentary and case notes are study aids, not legal advice.
 
 ### `/// STACK`
 
-- **Vanilla ES modules.** No framework, no bundler, no build step.
-- **Three.js r180**, vendored into `vendor/` behind an import map — nothing is fetched from a CDN at runtime.
-- **Hand-written GLSL** for every surface: the plasma core, the twenty-four ray blades, the faceted shafts, the tiling dust field, the survey grid, and the final grade (vignette, chromatic aberration, film grain).
-- `EffectComposer` + `UnrealBloomPass` for the bloom, then a custom grade pass.
-- Quality tiers off `deviceMemory` / `hardwareConcurrency`; pixel ratio capped well below retina, because the look is soft and the frames are cheaper that way.
-- Graceful degradation: if WebGL fails to initialise, the reading layer still works.
-
-### `/// LAYOUT`
+Vanilla ES modules, zero dependencies, zero build step. The whole experience is one
+HTML document, one stylesheet, and a few small modules. Engraved ornaments are inline
+SVG. Native scroll — nothing is hijacked.
 
 ```
-index.html            import map + the four layers (canvas, stage, hud, overlays)
-css/main.css          design system, layout, responsive, reduced motion
+index.html          the shell: masthead, index rail, document, overlays
+css/main.css        the design system — paper, ink, narra, brass, green
 js/
-  main.js             bootstrap, input, resize, the frame loop
-  core/
-    state.js          journey layout in screen-heights, phase maths, quality tiers
-    read.js           what has already been read, persisted
-    scroll.js         virtual scroll, smoothing, jumps
-    util.js           easing, damping, small DOM helpers
-  data/
-    sections.js       the 22 sections — verbatim text and all commentary
-    motifs.js         which signature each section wears, and its dust field
-    clusters.js       the nine movements and their palettes
-    prologue.js       1972–1987
-    quiz.js           15 recall scenarios
-  scene/
-    layout.js         camera spline, shaft placement, epilogue choreography
-    world.js          assembly, per-frame mood, focus, grade
-    sun.js            plasma core, 24 ray blades, halo, three stars
-    monoliths.js      the 22 shafts and the decorative counter-row
-    particles.js      starfield + camera-tiling dust
-    ground.js         the survey grid
-    post.js           bloom + final grade
-    glsl.js           shared noise and haze
-  ui/
-    reader.js         hero, prologue, the travelling card, the study spread, the epilogue
-    hud.js            wordmark, rail, position, tools
-    overlays.js       map + recall test
-    audio.js          synthesised ambience
-vendor/               Three.js r180 + the postprocessing addons
+  main.js           boot, index rail, observers, keyboard
+  ui/document.js    renders the entire document from the data
+  ui/ornaments.js   the engraved seal, bars, and chapter plates
+  ui/overlays.js    the searchable index and the recall test
+  core/read.js      what has been read, persisted
+  core/util.js      small helpers
+  data/             sections, movements, prologue, quiz, dedication
 ```
 
 ### `/// LOCAL`
 
-There is no build. Any static server will do:
-
 ```bash
-python3 -m http.server 8000
-# → http://localhost:8000
+python3 -m http.server 8000   # any static server
 ```
-
-Opening `index.html` from the filesystem will not work — ES modules and the import map need a real origin.
 
 ### `/// STATUS`
 
-Live at **[hatimhtm.github.io/article-iii](https://hatimhtm.github.io/article-iii/)**. Deployed from `main` by GitHub Actions.
+Live at **[hatimhtm.github.io/article-iii](https://hatimhtm.github.io/article-iii/)**,
+deployed from `main` by GitHub Actions.
 
 ---
 

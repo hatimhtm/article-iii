@@ -20,17 +20,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Every module referenced by the import map exists
-        run: |
-          test -f vendor/three.module.js
-          test -f vendor/three.core.js
-          for f in EffectComposer Pass ShaderPass MaskPass RenderPass UnrealBloomPass OutputPass; do
-            test -f "vendor/addons/postprocessing/$f.js"
-          done
-          for f in CopyShader LuminosityHighPassShader OutputShader; do
-            test -f "vendor/addons/shaders/$f.js"
-          done
-
       - name: All 22 sections are present and carry their commentary
         run: |
           node --input-type=module -e "
@@ -51,7 +40,6 @@ jobs:
       - name: Entry point is wired up
         run: |
           grep -q 'js/main.js' index.html
-          grep -q '"three": "./vendor/three.module.js"' index.html
           test -f .nojekyll
 
   deploy:
